@@ -30,7 +30,7 @@ HELIO_FLAGS = -DHELIO_RELEASE_FLAGS="-g" \
 .PHONY: default
 
 configure:
-	cmake -L -B $(RELEASE_DIR) -DCMAKE_BUILD_TYPE=Release -GNinja $(HELIO_FLAGS)
+	cmake -L -B $(RELEASE_DIR) -DCMAKE_BUILD_TYPE=Debug -GNinja $(HELIO_FLAGS)
 
 build:
 	cd $(RELEASE_DIR); \
