@@ -562,8 +562,12 @@ void RobjWrapper::ReserveString(size_t size, MemoryResource* mr) {
 }
 
 void RobjWrapper::AppendString(string_view s, MemoryResource* mr) {
+  DCHECK_EQ(OBJ_STRING, type());
+  DCHECK_EQ(OBJ_ENCODING_RAW, encoding());
   size_t cur_cap = InnerObjMallocUsed();
-  CHECK(cur_cap >= sz_ + s.size()) << cur_cap << " " << sz_ << " " << s.size();
+  if (cur_cap < sz_ + s.size()) {
+    MakeInnerRoom(cur_cap, sz_ + s.size(), mr);
+  }
   memcpy(reinterpret_cast<uint8_t*>(inner_obj_) + sz_, s.data(), s.size());
   sz_ += s.size();
 }

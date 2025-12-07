@@ -77,10 +77,12 @@ TEST_F(StringFamilyTest, Incr) {
 }
 
 TEST_F(StringFamilyTest, Append) {
-  Run({"setex", "key", "100", "val"});
+  Run({"setex", "key", "100", "foo"});
   EXPECT_THAT(Run({"ttl", "key"}), IntArg(100));
 
   EXPECT_THAT(Run({"append", "key", "bar"}), IntArg(6));
+  auto resp = Run({"get", "key"});
+  EXPECT_THAT(resp, "foobar");
   EXPECT_THAT(Run({"ttl", "key"}), IntArg(100));
 }
 
