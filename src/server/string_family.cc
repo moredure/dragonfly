@@ -220,14 +220,18 @@ OpResult<StringResult> OpGetRange(const OpArgs& op_args, string_view key, int32_
   }
 };
 
-// TODO: Don't copy whole value just to append
+// Prepend is not as optimized as append, because CompactObj does not have a PrependString method.
 size_t ExtendExisting(const DbSlice::Iterator& it, string_view key, string_view val, bool prepend) {
-  string tmp;
-  string_view slice = it->second.GetSlice(&tmp);
+  if (prepend) {
+    string tmp;
+    string_view slice = it->second.GetSlice(&tmp);
+    string new_val = absl::StrCat(val, slice);
+    it->second.SetString(new_val, false);
+    return new_val.size();
+  }
 
-  string new_val = prepend ? absl::StrCat(val, slice) : absl::StrCat(slice, val);
-  it->second.SetString(new_val, false);
-  return new_val.size();
+  it->second.AppendString(val);
+  return it->second.Size();
 }
 
 OpResult<bool> ExtendOrSkip(const OpArgs& op_args, string_view key, string_view val, bool prepend) {
